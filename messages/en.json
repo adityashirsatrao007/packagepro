@@ -55,7 +55,11 @@
     "noGuides": "No guides found for this filter",
     "bookingConfirmed": "Booking Confirmed!",
     "bookNow": "Book Now",
-    "totalPrice": "Total Price"
+    "totalPrice": "Total Price",
+    "share": "Share",
+    "save": "Save",
+    "linkCopied": "Link copied to clipboard!",
+    "saved": "Package saved!"
   },
   "aiBuilder": {
     "title": "AI Package Builder",

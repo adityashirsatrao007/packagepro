@@ -33,7 +33,25 @@ export async function POST(request: NextRequest) {
     };
   });
 
-  const systemPrompt = `You are PackagePro AI — an expert travel advisor for a tour package platform. You help travellers find and customise the perfect trip.
+  const isHindi = language.startsWith("hi");
+  const systemPrompt = isHindi
+    ? `IMPORTANT: You MUST respond entirely in Hindi (Devanagari script). Do NOT use English in your response. Every word must be in Hindi.
+
+तू PackagePro AI है — एक एक्सपर्ट ट्रैवल एडवाइज़र। तू यात्रियों को ट्रिप ढूंढने और कस्टमाइज़ करने में मदद करता है।
+
+उपलब्ध पैकेज:
+${JSON.stringify(packageSummaries)}
+
+नियम:
+- सिर्फ ऊपर दिए गए पैकेज में से recommend कर — exact IDs (pkg_xxx) use कर
+- हर recommendation में बता: price, duration, city, theme
+- Budget हो तो सिर्फ उसके अंदर वाले दिखा
+- POORI HINDI में बात कर — English में एक भी word नहीं आना चाहिए
+- 3-5 sentences per recommendation
+
+Last line में ये दे:
+RECOMMENDATIONS: pkg_id1,pkg_id2,pkg_id3`
+    : `You are PackagePro AI — an expert travel advisor for a tour package platform. You help travellers find and customise the perfect trip.
 
 Available packages from our database:
 ${JSON.stringify(packageSummaries)}
@@ -50,7 +68,9 @@ RULES:
 You MUST respond with valid JSON at the end. After your natural language response, add a line with:
 RECOMMENDATIONS: pkg_id1,pkg_id2,pkg_id3`;
 
-  const userMessage = `Find packages for: "${interests}"${budget ? `\nBudget: ${budget}` : ""}${city ? `\nCity: ${city}` : ""}`;
+  const userMessage = isHindi
+    ? `[ LANGUAGE: HINDI — respond ONLY in Hindi/Devanagari ] "${interests}" के लिए पैकेज ढूंढ${budget ? `\nबजट: ${budget}` : ""}${city ? `\nशहर: ${city}` : ""}`
+    : `Find packages for: "${interests}"${budget ? `\nBudget: ${budget}` : ""}${city ? `\nCity: ${city}` : ""}`;
 
   try {
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -62,6 +82,8 @@ RECOMMENDATIONS: pkg_id1,pkg_id2,pkg_id3`;
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
+          { role: "user", content: "You must respond in Hindi only. No English words allowed." },
+          { role: "assistant", content: "ठीक है, मैं हिंदी में जवाब दूँगा।" },
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },
         ],
@@ -95,6 +117,22 @@ RECOMMENDATIONS: pkg_id1,pkg_id2,pkg_id3`;
         }
       }
       matchedIds = [...new Set(matchedIds)].slice(0, 3);
+    }
+
+    // If Hindi requested but response is English, regenerate in Hindi
+    if (isHindi && !/[\u0900-\u097F]/.test(responseText) && matchedIds.length > 0) {
+      const hindiThemes: Record<string, string> = {
+        adventure: "साहसिक", heritage: "विरासत", honeymoon: "हनीमून",
+        family: "परिवार", pilgrimage: "तीर्थयात्रा", wellness: "कल्याण",
+        wildlife: "वन्यजीव", food_trail: "खाद्य पथ",
+      };
+      const lines = matchedIds.map((id) => {
+        const pkg = topPackages.find((p) => p.package_id === id);
+        if (!pkg) return "";
+        const themeHindi = hindiThemes[pkg.theme] || pkg.theme;
+        return `**${pkg.name}** (${themeHindi}) — ${pkg.duration_days} दिन/${pkg.duration_nights} रात | ${pkg.base_price} ${pkg.currency}`;
+      }).filter(Boolean);
+      responseText = `आपकी "${interests}" रुचि के लिए${budget ? ` और ${budget} बजट में` : ""}, ये पैकेज बेहतरीन हैं:\n\n${lines.join("\n\n")}`;
     }
 
     const recommendations = matchedIds.map((id) => {
@@ -150,11 +188,26 @@ RECOMMENDATIONS: pkg_id1,pkg_id2,pkg_id3`;
 
     let responseText = "";
     if (results.length === 0) {
-      responseText = `I couldn't find a strong match for "${interests}". Try broadening your interests.`;
+      responseText = isHindi
+        ? `"${interests}" के लिए कोई मजबूत मैच नहीं मिला। कृपया अपनी रुचियाँ व्यापक बनाएं।`
+        : `I couldn't find a strong match for "${interests}". Try broadening your interests.`;
     } else {
-      responseText = `Based on your interests in "${interests}"${budget ? ` with a budget of ${budget}` : ""}, I recommend:\n\n`;
-      for (const r of results) {
-        responseText += `**${r.package.name}** (${r.package.theme})\n${r.package.duration_days}D/${r.package.duration_nights}N | ${r.package.tier} | ${r.package.base_price} ${r.package.currency}\n${r.reason}\n\n`;
+      if (isHindi) {
+        const hindiThemes: Record<string, string> = {
+          adventure: "साहसिक", heritage: "विरासत", honeymoon: "हनीमून",
+          family: "परिवार", pilgrimage: "तीर्थयात्रा", wellness: "कल्याण",
+          wildlife: "वन्यजीव", food_trail: "खाद्य पथ",
+        };
+        responseText = `"${interests}" के आपके हितों के लिए${budget ? ` और ${budget} बजट में` : ""}:\n\n`;
+        for (const r of results) {
+          const themeHindi = hindiThemes[r.package.theme] || r.package.theme;
+          responseText += `**${r.package.name}** (${themeHindi})\n${r.package.duration_days} दिन/${r.package.duration_nights} रात | ${r.package.tier} | ${r.package.base_price} ${r.package.currency}\n\n`;
+        }
+      } else {
+        responseText = `Based on your interests in "${interests}"${budget ? ` with a budget of ${budget}` : ""}, I recommend:\n\n`;
+        for (const r of results) {
+          responseText += `**${r.package.name}** (${r.package.theme})\n${r.package.duration_days}D/${r.package.duration_nights}N | ${r.package.tier} | ${r.package.base_price} ${r.package.currency}\n\n`;
+        }
       }
     }
 

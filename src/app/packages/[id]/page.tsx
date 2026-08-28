@@ -324,6 +324,49 @@ export default function PackagePage() {
               <PriceDisplay result={priceResult} onBook={handleBook} />
             )}
 
+            {/* Save & Share */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const url = window.location.href;
+                    navigator.clipboard.writeText(url);
+                    alert(t("linkCopied") || "Link copied to clipboard!");
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium text-gray-700 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  {t("share") || "Share"}
+                </button>
+                <button
+                  onClick={() => {
+                    const data = {
+                      packageId: pkgId,
+                      name: pkg.name,
+                      city: pkg.city_name,
+                      basePrice: pkg.base_price,
+                      currency: pkg.currency,
+                      selectedComponents: Array.from(selectedComponents),
+                      guideId: selectedGuide?.guide_id || null,
+                      savedAt: new Date().toISOString(),
+                    };
+                    const saved = JSON.parse(localStorage.getItem("savedPackages") || "[]");
+                    saved.push(data);
+                    localStorage.setItem("savedPackages", JSON.stringify(saved));
+                    alert(t("saved") || "Package saved!");
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 rounded-xl text-sm font-medium text-blue-700 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  {t("save") || "Save"}
+                </button>
+              </div>
+            </div>
+
             {selectedGuide && (
               <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
                 <h3 className="text-sm font-semibold text-gray-900 mb-3">
