@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import type { TourPackage } from "@/types";
 import PackageCard from "@/components/PackageCard";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { useTranslations } from "@/lib/useTranslations";
+import { motion } from "framer-motion";
+import { Search, Sparkles, Globe, Shield, Zap } from "lucide-react";
 
 export default function HomePage() {
   const [packages, setPackages] = useState<TourPackage[]>([]);
@@ -12,23 +14,17 @@ export default function HomePage() {
   const [themeFilter, setThemeFilter] = useState("");
   const { language } = useLanguageStore();
   const t = useTranslations("home");
-  const [heroVisible, setHeroVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setHeroVisible(true);
-  }, []);
 
   const themes = [
-    { value: "", label: t("allThemes"), icon: "🌍", color: "from-gray-600 to-gray-800" },
-    { value: "adventure", label: t("adventure"), icon: "🏔️", color: "from-orange-500 to-red-500" },
-    { value: "honeymoon", label: t("honeymoon"), icon: "💑", color: "from-pink-500 to-rose-500" },
-    { value: "pilgrimage", label: t("pilgrimage"), icon: "🙏", color: "from-amber-500 to-yellow-500" },
-    { value: "family", label: t("family"), icon: "👨‍👩‍👧‍👦", color: "from-emerald-500 to-green-500" },
-    { value: "heritage", label: t("heritage"), icon: "🏛️", color: "from-purple-500 to-indigo-500" },
-    { value: "wellness", label: t("wellness"), icon: "🧘", color: "from-teal-500 to-cyan-500" },
-    { value: "wildlife", label: t("wildlife"), icon: "🦁", color: "from-green-500 to-emerald-500" },
-    { value: "food_trail", label: t("foodTrail"), icon: "🍜", color: "from-red-500 to-orange-500" },
+    { value: "", label: t("allThemes"), icon: "🌍" },
+    { value: "adventure", label: t("adventure"), icon: "🏔️" },
+    { value: "honeymoon", label: t("honeymoon"), icon: "💑" },
+    { value: "pilgrimage", label: t("pilgrimage"), icon: "🙏" },
+    { value: "family", label: t("family"), icon: "👨‍👩‍👧‍👦" },
+    { value: "heritage", label: t("heritage"), icon: "🏛️" },
+    { value: "wellness", label: t("wellness"), icon: "🧘" },
+    { value: "wildlife", label: t("wildlife"), icon: "🦁" },
+    { value: "food_trail", label: t("foodTrail"), icon: "🍜" },
   ];
 
   useEffect(() => {
@@ -58,164 +54,149 @@ export default function HomePage() {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/70 to-slate-900/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-          <div className="max-w-2xl">
-            <div
-              className={`transition-all duration-700 ${
-                heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
+        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+          <div className="w-full max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/80 border border-white/10 mb-6">
-                <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                60 curated packages across 20+ cities
-              </span>
-
-              <h1 className="text-6xl font-extrabold text-white leading-[1.1] tracking-tight">
-                Your Journey,
-                <br />
-                <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-                  Your Way
-                </span>
-              </h1>
-
-              <p className="text-lg text-gray-300 mt-6 max-w-lg leading-relaxed">
-                Curated tour packages you can customise piece by piece. Swap
-                hotels, add guides, change activities — watch the price update
-                live.
-              </p>
-            </div>
-
-            <div
-              className={`flex gap-3 mt-8 transition-all duration-700 delay-200 ${
-                heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-            >
-              <a
-                href="#packages"
-                className="px-7 py-3.5 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:-translate-y-0.5"
-              >
-                Browse Packages
-              </a>
-              <a
-                href="/ai-builder"
-                className="px-7 py-3.5 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20 backdrop-blur-sm hover:-translate-y-0.5"
-              >
-                ✨ AI Builder
-              </a>
-            </div>
-
-            <div
-              className={`flex items-center gap-8 mt-10 transition-all duration-700 delay-400 ${
-                heroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-            >
-              {[
-                { icon: "✓", text: "60+ packages" },
-                { icon: "⚡", text: "Live repricing" },
-                { icon: "🌐", text: "11 languages" },
-                { icon: "🤖", text: "AI recommendations" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-gray-400">
-                  <span className="text-blue-400 font-bold">{item.icon}</span>
-                  <span>{item.text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Floating stats */}
-        <div
-          className={`absolute right-8 top-1/2 -translate-y-1/2 hidden xl:block transition-all duration-1000 delay-500 ${
-            heroVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-12"
-          }`}
-        >
-          <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 p-6 space-y-4">
-            {[
-              { num: "60", label: "Packages" },
-              { num: "420", label: "Components" },
-              { num: "120", label: "Guides" },
-              { num: "20+", label: "Cities" },
-            ].map((stat, i) => (
-              <div key={i} className="text-center">
-                <p className="text-2xl font-bold text-white">{stat.num}</p>
-                <p className="text-xs text-gray-400">{stat.label}</p>
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/90 font-medium mb-6 border border-white/10">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                AI-Powered Travel Planning
               </div>
-            ))}
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl md:text-6xl font-bold text-white leading-tight"
+            >
+              {t("heroTitle")}
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg text-white/70 mt-4 max-w-lg"
+            >
+              {t("heroSubtitle")}
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-wrap gap-3 mt-8"
+            >
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl text-white/80 text-sm border border-white/10">
+                <Globe className="w-4 h-4" />
+                11 Languages
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl text-white/80 text-sm border border-white/10">
+                <Shield className="w-4 h-4" />
+                Certified Guides
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-xl text-white/80 text-sm border border-white/10">
+                <Zap className="w-4 h-4" />
+                Live Pricing
+              </div>
+            </motion.div>
           </div>
         </div>
+
+        {/* Stats Panel */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="hidden lg:flex absolute right-8 top-1/2 -translate-y-1/2 flex-col gap-4"
+        >
+          {[
+            { label: "Packages", value: "60+", icon: "📦" },
+            { label: "Cities", value: "25+", icon: "🏙️" },
+            { label: "Guides", value: "120+", icon: "🗣️" },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 + i * 0.1 }}
+              className="bg-white/10 backdrop-blur-xl rounded-2xl p-5 border border-white/10 w-40"
+            >
+              <span className="text-2xl">{stat.icon}</span>
+              <p className="text-2xl font-bold text-white mt-2">{stat.value}</p>
+              <p className="text-sm text-white/60">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </section>
 
-      {/* Packages */}
-      <section
-        id="packages"
-        ref={sectionRef}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
-      >
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {t("heroTitle")}
-            </h2>
-            <p className="text-gray-500 mt-1">
-              {t("packagesFound", { count: packages.length })}
-            </p>
-          </div>
-        </div>
-
-        {/* Theme filters */}
-        <div className="flex gap-2 flex-wrap mb-8">
+      {/* Theme Filter */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide"
+        >
           {themes.map((theme) => (
-            <button
+            <motion.button
               key={theme.value}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setThemeFilter(theme.value)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                 themeFilter === theme.value
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-600/25 scale-105"
-                  : "bg-white border border-gray-200 text-gray-700 hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5"
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-600/30"
+                  : "bg-white text-gray-600 hover:bg-gray-50 border border-gray-200"
               }`}
             >
-              <span className="mr-1.5">{theme.icon}</span>
+              <span>{theme.icon}</span>
               {theme.label}
-            </button>
+            </motion.button>
           ))}
+        </motion.div>
+      </section>
+
+      {/* Packages Grid */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">{t("curatedPackages")}</h2>
+            <p className="text-gray-500 mt-1">{packages.length} packages available</p>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Search className="w-4 h-4" />
+            AI-powered recommendations
+          </div>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse"
-                style={{ animationDelay: `${i * 100}ms` }}
-              >
-                <div className="h-52 bg-gray-200" />
-                <div className="p-5 space-y-3">
-                  <div className="h-5 bg-gray-200 rounded w-3/4" />
-                  <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  <div className="h-4 bg-gray-200 rounded w-2/3" />
+              <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="h-6 bg-gray-200 rounded w-1/3" />
                 </div>
               </div>
             ))}
           </div>
         ) : packages.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-gray-100">
-            <p className="text-4xl mb-4">🔍</p>
-            <p className="text-gray-500 text-lg">{t("packagesFound", { count: 0 })}</p>
+          <div className="text-center py-16">
+            <p className="text-gray-400 text-lg">No packages found for this filter.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {packages.map((pkg, idx) => (
-              <div
-                key={pkg.package_id}
-                className="animate-fadeInUp"
-                style={{ animationDelay: `${idx * 60}ms` }}
-              >
-                <PackageCard pkg={pkg} />
-              </div>
+              <PackageCard key={pkg.package_id} pkg={pkg} index={idx} />
             ))}
           </div>
         )}

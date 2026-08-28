@@ -1,102 +1,148 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { useTranslations } from "@/lib/useTranslations";
+import { motion, AnimatePresence } from "framer-motion";
+import { Globe, Menu, X, Plane } from "lucide-react";
 
 const languages = [
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
   { code: "ta", label: "தமிழ்", flag: "🇮🇳" },
-  { code: "mr", label: "मराठी", flag: "🇮🇳" },
   { code: "te", label: "తెలుగు", flag: "🇮🇳" },
+  { code: "bn", label: "বাংলা", flag: "🇮🇳" },
+  { code: "mr", label: "मराठी", flag: "🇮🇳" },
+  { code: "gu", label: "ગુજરાતી", flag: "🇮🇳" },
   { code: "kn", label: "ಕನ್ನಡ", flag: "🇮🇳" },
   { code: "ml", label: "മലയാളം", flag: "🇮🇳" },
-  { code: "bn", label: "বাংলা", flag: "🇮🇳" },
-  { code: "gu", label: "ગુજરાતી", flag: "🇮🇳" },
   { code: "pa", label: "ਪੰਜਾਬੀ", flag: "🇮🇳" },
-  { code: "ar", label: "العربية", flag: "🇸🇦" },
+  { code: "ur", label: "اردو", flag: "🇵🇰" },
 ];
 
 export default function Navbar() {
   const { language, setLanguage } = useLanguageStore();
-  const pathname = usePathname();
   const t = useTranslations("nav");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+
+  const currentLang = languages.find((l) => l.code === language) || languages[0];
 
   return (
-    <nav className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-              <svg
-                className="w-5 h-5 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">
+        <div className="flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <motion.div
+              whileHover={{ rotate: 15 }}
+              className="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20"
+            >
+              <Plane className="w-5 h-5 text-white" />
+            </motion.div>
+            <span className="text-lg font-bold text-gray-900">
               Package<span className="text-blue-600">Pro</span>
             </span>
           </Link>
 
-          <div className="flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1">
             <Link
               href="/"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                pathname === "/"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
-              {t("packages")}
+              {t("home")}
             </Link>
             <Link
               href="/ai-builder"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                pathname === "/ai-builder"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               {t("aiBuilder")}
             </Link>
             <Link
               href="/booking"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                pathname === "/booking"
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
-              {t("bookings")}
+              {t("myBookings")}
             </Link>
+          </div>
 
-            <div className="ml-3 pl-3 border-l border-gray-200">
-              <select
-                value={language.startsWith("hi") ? "hi" : "en"}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="text-sm border-0 bg-gray-50 rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <div className="relative">
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors border border-gray-200"
               >
-                {languages.map((l) => (
-                  <option key={l.code} value={l.code}>
-                    {l.flag} {l.label}
-                  </option>
-                ))}
-              </select>
+                <Globe className="w-4 h-4" />
+                <span className="hidden sm:inline">{currentLang.flag} {currentLang.label}</span>
+              </motion.button>
+
+              <AnimatePresence>
+                {langOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50"
+                  >
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setLanguage(lang.code === "en" ? "en-IN" : `${lang.code}-IN`);
+                          setLangOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors ${
+                          language.startsWith(lang.code)
+                            ? "bg-blue-50 text-blue-700 font-medium"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span>{lang.flag}</span>
+                        <span>{lang.label}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
+
+            {/* Mobile Toggle */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden border-t border-gray-100 bg-white overflow-hidden"
+          >
+            <div className="px-4 py-3 space-y-1">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                {t("home")}
+              </Link>
+              <Link href="/ai-builder" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                {t("aiBuilder")}
+              </Link>
+              <Link href="/booking" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                {t("myBookings")}
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

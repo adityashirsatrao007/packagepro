@@ -3,7 +3,35 @@
 import Link from "next/link";
 import type { TourPackage } from "@/types";
 import { formatPrice } from "@/lib/pricing";
-import { useTranslations } from "@/lib/useTranslations";
+import { motion } from "framer-motion";
+import { MapPin, Clock, Star, ArrowRight } from "lucide-react";
+
+interface PackageCardProps {
+  pkg: TourPackage;
+  index?: number;
+}
+
+const themeGradients: Record<string, string> = {
+  adventure: "from-emerald-500 to-teal-600",
+  heritage: "from-amber-500 to-orange-600",
+  honeymoon: "from-pink-500 to-rose-600",
+  family: "from-blue-500 to-indigo-600",
+  pilgrimage: "from-purple-500 to-violet-600",
+  wellness: "from-cyan-500 to-sky-600",
+  wildlife: "from-lime-500 to-green-600",
+  food_trail: "from-red-500 to-rose-600",
+};
+
+const themeIcons: Record<string, string> = {
+  adventure: "🏔️",
+  heritage: "🏛️",
+  honeymoon: "💕",
+  family: "👨‍👩‍👧‍👦",
+  pilgrimage: "🙏",
+  wellness: "🧘",
+  wildlife: "🐘",
+  food_trail: "🍽️",
+};
 
 const cityImages: Record<string, string> = {
   jaipur: "/images/packages/jaipur.jpg",
@@ -11,171 +39,87 @@ const cityImages: Record<string, string> = {
   jodhpur: "/images/packages/jodhpur.jpg",
   agra: "/images/packages/agra.jpg",
   varanasi: "/images/packages/varanasi.jpg",
-  "new delhi": "/images/packages/delhi.jpg",
   mumbai: "/images/packages/mumbai.jpg",
   dubai: "/images/packages/dubai.jpg",
-  kolkata: "/images/packages/kolkata.jpg",
-  chennai: "/images/packages/chennai.jpg",
+  bali: "/images/packages/bali.jpg",
   bangkok: "/images/packages/bangkok.jpg",
   singapore: "/images/packages/singapore.jpg",
   kathmandu: "/images/packages/kathmandu.jpg",
-  kochi: "/images/packages/kochi.jpg",
-  rishikesh: "/images/packages/rishikesh.jpg",
+  kolkata: "/images/packages/kolkata.jpg",
+  chennai: "/images/packages/chennai.jpg",
+  delhi: "/images/packages/delhi.jpg",
   manali: "/images/packages/manali.jpg",
-  darjeeling: "/images/packages/darjeeling.jpg",
-  hampi: "/images/packages/hampi.jpg",
-  panaji: "/images/packages/goa.jpg",
-  bali: "/images/packages/bali.jpg",
+  goa: "/images/packages/goa.jpg",
+  rishikesh: "/images/packages/rishikesh.jpg",
   kyoto: "/images/packages/kyoto.jpg",
   zurich: "/images/packages/zurich.jpg",
+  default: "/images/packages/default.jpg",
 };
 
-const themeGradients: Record<string, string> = {
-  adventure: "from-orange-600 to-red-600",
-  honeymoon: "from-pink-500 to-rose-500",
-  pilgrimage: "from-amber-500 to-yellow-500",
-  family: "from-emerald-500 to-green-500",
-  heritage: "from-purple-600 to-indigo-600",
-  wellness: "from-teal-500 to-cyan-500",
-  wildlife: "from-green-600 to-emerald-600",
-  food_trail: "from-red-500 to-orange-500",
-};
-
-const tierStyles: Record<string, string> = {
-  standard: "bg-white/90 text-gray-800",
-  deluxe: "bg-blue-500/90 text-white",
-  premium: "bg-gradient-to-r from-amber-400 to-orange-400 text-white",
-};
-
-interface PackageCardProps {
-  pkg: TourPackage;
-}
-
-export default function PackageCard({ pkg }: PackageCardProps) {
-  const t = useTranslations("home");
-  const imgSrc =
-    cityImages[pkg.city_name?.toLowerCase() || ""] ||
-    "/images/packages/default.jpg";
-  const gradient = themeGradients[pkg.theme] || "from-gray-600 to-gray-800";
-
-  const themeLabelKey = pkg.theme === "food_trail" ? "foodTrail" : pkg.theme;
+export default function PackageCard({ pkg, index = 0 }: PackageCardProps) {
+  const gradient = themeGradients[pkg.theme] || "from-gray-500 to-gray-600";
+  const themeIcon = themeIcons[pkg.theme] || "📦";
+  const imgSrc = cityImages[pkg.city_name?.toLowerCase() || ""] || cityImages.default;
 
   return (
-    <Link
-      href={`/packages/${pkg.package_id}`}
-      className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 card-hover"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
     >
-      <div className="h-52 relative overflow-hidden">
-        <img
-          src={imgSrc}
-          alt={pkg.name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-
-        {/* Theme badge */}
-        <div className="absolute top-3 left-3">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${gradient} text-white shadow-lg`}
-          >
-            {t(themeLabelKey)}
-          </span>
-        </div>
-
-        {/* Tier badge */}
-        <div className="absolute top-3 right-3">
-          <span
-            className={`px-2.5 py-1 rounded-full text-xs font-semibold ${tierStyles[pkg.tier]} backdrop-blur-sm`}
-          >
-            {pkg.tier.charAt(0).toUpperCase() + pkg.tier.slice(1)}
-          </span>
-        </div>
-
-        {/* Duration overlay */}
-        <div className="absolute bottom-3 left-3">
-          <span className="px-2.5 py-1 rounded-lg text-xs font-medium bg-black/50 text-white backdrop-blur-sm">
-            {t("days", { count: pkg.duration_days })} / {t("nights", { count: pkg.duration_nights })}
-          </span>
-        </div>
-      </div>
-
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-              {pkg.name}
-            </h3>
-            <div className="flex items-center gap-1.5 mt-1">
-              <svg
-                className="w-3.5 h-3.5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <p className="text-sm text-gray-500">{pkg.city_name}</p>
+      <Link href={`/packages/${pkg.package_id}`} className="block group">
+        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          {/* Image */}
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={imgSrc}
+              alt={pkg.city_name || ""}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            <div className={`absolute top-3 left-3 px-2.5 py-1 bg-gradient-to-r ${gradient} text-white text-xs font-semibold rounded-lg flex items-center gap-1 shadow-lg`}>
+              <span>{themeIcon}</span>
+              <span className="capitalize">{pkg.theme.replace("_", " ")}</span>
+            </div>
+            <div className="absolute bottom-3 left-3">
+              <h3 className="text-lg font-bold text-white drop-shadow-lg">{pkg.name}</h3>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <MapPin className="w-3.5 h-3.5 text-white/80" />
+                <span className="text-sm text-white/90">{pkg.city_name}</span>
+              </div>
             </div>
           </div>
-          <div className="text-right shrink-0">
-            <p className="text-xs text-gray-400 uppercase tracking-wide">
-              {t("perPerson")}
-            </p>
-            <p className="text-xl font-bold text-gray-900">
-              {formatPrice(pkg.base_price, pkg.currency)}
-            </p>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          {pkg.languages_offered
-            .split(",")
-            .slice(0, 3)
-            .map((lang) => (
-              <span
-                key={lang}
-                className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md text-xs font-medium"
+          {/* Content */}
+          <div className="p-4">
+            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{pkg.duration_days}D / {pkg.duration_nights}N</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <span className="font-medium text-gray-700 capitalize">{pkg.tier}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatPrice(pkg.base_price, pkg.currency)}
+                </p>
+                <p className="text-xs text-gray-400">per person</p>
+              </div>
+              <motion.div
+                whileHover={{ x: 4 }}
+                className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors"
               >
-                {lang.trim()}
-              </span>
-            ))}
-          <span className="text-gray-300">·</span>
-          <span className="text-xs text-gray-500 capitalize">
-            {pkg.difficulty}
-          </span>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-1 text-sm text-blue-600 font-medium group-hover:gap-2 transition-all">
-            <span>{t("customise")}</span>
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+                <ArrowRight className="w-5 h-5 text-blue-600 group-hover:text-white transition-colors" />
+              </motion.div>
+            </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }
