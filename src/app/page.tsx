@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import type { TourPackage } from "@/types";
 import PackageCard from "@/components/PackageCard";
 import { useLanguageStore } from "@/store/useLanguageStore";
-import { useTranslations } from "@/lib/useTranslations";
 import { motion } from "framer-motion";
 import { Search, Sparkles, Globe, Shield, Zap } from "lucide-react";
 
@@ -13,18 +12,17 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [themeFilter, setThemeFilter] = useState("");
   const { language } = useLanguageStore();
-  const t = useTranslations("home");
 
   const themes = [
-    { value: "", label: t("allThemes"), icon: "🌍" },
-    { value: "adventure", label: t("adventure"), icon: "🏔️" },
-    { value: "honeymoon", label: t("honeymoon"), icon: "💑" },
-    { value: "pilgrimage", label: t("pilgrimage"), icon: "🙏" },
-    { value: "family", label: t("family"), icon: "👨‍👩‍👧‍👦" },
-    { value: "heritage", label: t("heritage"), icon: "🏛️" },
-    { value: "wellness", label: t("wellness"), icon: "🧘" },
-    { value: "wildlife", label: t("wildlife"), icon: "🦁" },
-    { value: "food_trail", label: t("foodTrail"), icon: "🍜" },
+    { value: "", label: language.startsWith("hi") ? "सभी" : "All", icon: "🌍" },
+    { value: "adventure", label: language.startsWith("hi") ? "साहसिक" : "Adventure", icon: "🏔️" },
+    { value: "honeymoon", label: language.startsWith("hi") ? "हनीमून" : "Honeymoon", icon: "💑" },
+    { value: "pilgrimage", label: language.startsWith("hi") ? "तीर्थयात्रा" : "Pilgrimage", icon: "🙏" },
+    { value: "family", label: language.startsWith("hi") ? "परिवार" : "Family", icon: "👨‍👩‍👧‍👦" },
+    { value: "heritage", label: language.startsWith("hi") ? "विरासत" : "Heritage", icon: "🏛️" },
+    { value: "wellness", label: language.startsWith("hi") ? "कल्याण" : "Wellness", icon: "🧘" },
+    { value: "wildlife", label: language.startsWith("hi") ? "वन्यजीव" : "Wildlife", icon: "🦁" },
+    { value: "food_trail", label: language.startsWith("hi") ? "खाद्य पथ" : "Food Trail", icon: "🍜" },
   ];
 
   useEffect(() => {
@@ -75,7 +73,7 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-5xl md:text-6xl font-bold text-white leading-tight"
             >
-              {t("heroTitle")}
+              {language.startsWith("hi") ? "अपनी परफेक्ट ट्रिप बनाएं" : "Curated Travel Packages"}
             </motion.h1>
 
             <motion.p
@@ -84,7 +82,9 @@ export default function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-lg text-white/70 mt-4 max-w-lg"
             >
-              {t("heroSubtitle")}
+              {language.startsWith("hi")
+                ? "AI-संचालित यात्रा योजना जो आपके बजट और रुचियों के अनुरूप है"
+                : "AI-powered travel planning tailored to your budget and interests"}
             </motion.p>
 
             <motion.div
@@ -165,9 +165,11 @@ export default function HomePage() {
 
       {/* Packages Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{t("curatedPackages")}</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {language.startsWith("hi") ? "चयनित पैकेज" : "Curated Packages"}
+            </h2>
             <p className="text-gray-500 mt-1">{packages.length} packages available</p>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
