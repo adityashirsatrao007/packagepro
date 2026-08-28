@@ -23,7 +23,7 @@ const languages = [
 
 export default function Navbar() {
   const { language, setLanguage } = useLanguageStore();
-  const t = useTranslations("nav");
+  const t = useTranslations();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export default function Navbar() {
             >
               <Plane className="w-5 h-5 text-white" />
             </motion.div>
-            <span className="text-lg font-bold text-gray-900">
+            <span className="font-heading text-xl font-bold text-gray-900">
               Package<span className="text-blue-600">Pro</span>
             </span>
           </Link>
@@ -48,19 +48,19 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             <Link
               href="/"
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               {t("home")}
             </Link>
             <Link
               href="/ai-builder"
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               {t("aiBuilder")}
             </Link>
             <Link
               href="/booking"
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               {t("myBookings")}
             </Link>
@@ -130,13 +130,13 @@ export default function Navbar() {
             className="md:hidden border-t border-gray-100 bg-white overflow-hidden"
           >
             <div className="px-4 py-3 space-y-1">
-              <Link href="/" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <Link href="/" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg">
                 {t("home")}
               </Link>
-              <Link href="/ai-builder" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <Link href="/ai-builder" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg">
                 {t("aiBuilder")}
               </Link>
-              <Link href="/booking" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <Link href="/booking" onClick={() => setMobileOpen(false)} className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-lg">
                 {t("myBookings")}
               </Link>
             </div>

@@ -31,12 +31,11 @@ export default function GuideSelector({
   onSelect,
 }: GuideSelectorProps) {
   const [guides, setGuides] = useState<TourGuide[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [specFilter, setSpecFilter] = useState("");
-  const t = useTranslations("customiser");
+  const t = useTranslations();
 
   useEffect(() => {
-    setLoading(true);
     const now = new Date();
     const endDate = new Date(now);
     endDate.setDate(endDate.getDate() + 7);
@@ -98,7 +97,7 @@ export default function GuideSelector({
         {specialisations.map((s) => (
           <button
             key={s.value}
-            onClick={() => setSpecFilter(s.value)}
+            onClick={() => { setLoading(true); setSpecFilter(s.value); }}
             className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${
               specFilter === s.value
                 ? "bg-blue-600 text-white"

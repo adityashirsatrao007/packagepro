@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { RepriceResult } from "@/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, TrendingUp, TrendingDown, Check, Sparkles } from "lucide-react";
@@ -11,18 +11,34 @@ interface PriceDisplayProps {
 }
 
 function AnimatedPrice({ value, currency }: { value: string; currency: string }) {
-  const [displayValue, setDisplayValue] = useState("0");
-  const [flash, setFlash] = useState(false);
+  const spanRef = useRef<HTMLSpanElement>(null);
+  const prevValueRef = useRef("0");
+  const flashRef = useRef<HTMLSpanElement>(null);
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const target = parseFloat(value);
-    const start = parseFloat(displayValue) || 0;
+    const start = parseFloat(prevValueRef.current) || 0;
     const diff = target - start;
     const duration = 600;
     const startTime = Date.now();
+    prevValueRef.current = value;
 
-    setFlash(true);
-    setTimeout(() => setFlash(false), 400);
+    if (flashRef.current) {
+      flashRef.current.animate(
+        [{ transform: "scale(1)" }, { transform: "scale(1.05)" }, { transform: "scale(1)" }],
+        { duration: 300, easing: "ease-out" }
+      );
+    }
+
+    const format = (current: number) => {
+      if (currency === "IDR" || currency === "THB") {
+        return current.toLocaleString("en-US", { maximumFractionDigits: 0 });
+      }
+      return current.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
+    const prefix = currency === "IDR" || currency === "THB" ? "" : "\u20B9";
 
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -30,25 +46,25 @@ function AnimatedPrice({ value, currency }: { value: string; currency: string })
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = start + diff * eased;
 
-      if (currency === "IDR" || currency === "THB") {
-        setDisplayValue(current.toLocaleString("en-US", { maximumFractionDigits: 0 }));
-      } else {
-        setDisplayValue(current.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      if (spanRef.current) {
+        spanRef.current.textContent = prefix + format(current);
       }
 
-      if (progress < 1) requestAnimationFrame(animate);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      }
     };
 
-    requestAnimationFrame(animate);
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
   }, [value, currency]);
 
   return (
     <motion.span
-      animate={flash ? { scale: [1, 1.05, 1] } : {}}
-      transition={{ duration: 0.3 }}
+      ref={flashRef}
       className="text-3xl font-bold text-gray-900"
     >
-      {currency === "IDR" || currency === "THB" ? "" : "₹"}{displayValue}{" "}
+      <span ref={spanRef}>{currency === "IDR" || currency === "THB" ? "" : "\u20B9"}0</span>{" "}
       <span className="text-lg font-medium text-gray-400">{currency}</span>
     </motion.span>
   );

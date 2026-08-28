@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getPackages, getPackageComponents, getGuides } from "@/lib/db";
+import { getPackages, getPackageComponents } from "@/lib/db";
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY || "";
 

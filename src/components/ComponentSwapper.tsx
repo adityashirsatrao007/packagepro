@@ -22,7 +22,7 @@ export default function ComponentSwapper({
 }: ComponentSwapperProps) {
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [justSwapped, setJustSwapped] = useState(false);
-  const t = useTranslations("customiser");
+  const t = useTranslations();
 
   const typeIcons: Record<string, string> = {
     hotel: "🏨",

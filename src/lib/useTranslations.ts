@@ -6,11 +6,7 @@ import hi from "../../messages/hi.json";
 
 const messages: Record<string, Record<string, unknown>> = { en, hi };
 
-type NestedKeyOf<T> = T extends object
-  ? { [K in keyof T & string]: K extends keyof T ? (T[K] extends object ? `${K}.${NestedKeyOf<T[K]>}` : K) : never }[keyof T & string]
-  : never;
-
-export function useTranslations(namespace: string) {
+export function useTranslations() {
   const { language } = useLanguageStore();
   const locale = language.startsWith("hi") ? "hi" : "en";
 

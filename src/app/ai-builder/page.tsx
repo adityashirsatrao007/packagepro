@@ -6,6 +6,8 @@ import type { TourPackage, PackageComponent } from "@/types";
 import { formatPrice } from "@/lib/pricing";
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { useTranslations } from "@/lib/useTranslations";
+import { motion } from "framer-motion";
+import { Sparkles, Send, ArrowRight, MapPin, Clock, Star, Loader2 } from "lucide-react";
 
 interface Recommendation {
   package: TourPackage;
@@ -15,18 +17,18 @@ interface Recommendation {
 }
 
 const suggestions = [
-  "Heritage walk in Rajasthan with a local guide",
-  "Beach honeymoon in Bali, 5 days, luxury",
-  "Family pilgrimage to Varanasi, budget-friendly",
-  "Wildlife safari adventure in Kerala",
-  "Food trail across Mumbai and Pune",
-  "Wellness retreat in Rishikesh, yoga and meditation",
+  { text: "Heritage walk in Rajasthan with a local guide", icon: "🏛️" },
+  { text: "Beach honeymoon in Bali, 5 days, luxury", icon: "💑" },
+  { text: "Family pilgrimage to Varanasi, budget-friendly", icon: "🙏" },
+  { text: "Wildlife safari adventure in Kerala", icon: "🐘" },
+  { text: "Food trail across Mumbai and Pune", icon: "🍜" },
+  { text: "Wellness retreat in Rishikesh, yoga and meditation", icon: "🧘" },
 ];
 
 export default function AIBuilderPage() {
   const router = useRouter();
   const { language } = useLanguageStore();
-  const t = useTranslations("aiBuilder");
+  const t = useTranslations();
   const [interests, setInterests] = useState("");
   const [budget, setBudget] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,161 +60,211 @@ export default function AIBuilderPage() {
     }
   };
 
+  const themeIcons: Record<string, string> = {
+    adventure: "🏔️", heritage: "🏛️", honeymoon: "💕",
+    family: "👨‍👩‍👧‍👦", pilgrimage: "🙏", wellness: "🧘",
+    wildlife: "🐘", food_trail: "🍽️",
+  };
+
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
+    <main className="max-w-5xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full text-sm text-blue-700 font-medium mb-4">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Powered by LLaMA 3.3 70B
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 text-center"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-full text-[13px] text-amber-700 font-bold mb-4 border border-amber-200 uppercase tracking-wider">
+          <Sparkles className="w-4 h-4 text-amber-500" />
+          Powered by LLaMA 3.3 70B via Groq
         </div>
-        <h1 className="text-4xl font-bold text-gray-900">{t("title")}</h1>
-        <p className="text-gray-500 mt-2 text-lg">{t("subtitle")}</p>
-      </div>
+        <h1 className="font-heading text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
+          {t("title")}
+        </h1>
+        <p className="text-gray-500 mt-3 text-[15px] md:text-base max-w-xl mx-auto leading-relaxed">
+          {t("subtitle")}
+        </p>
+      </motion.div>
 
-      {/* Input Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t("whatLookingFor")}
-            </label>
-            <textarea
-              value={interests}
-              onChange={(e) => setInterests(e.target.value)}
-              placeholder={t("placeholder")}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all"
-              rows={3}
-              disabled={loading}
-            />
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        {/* Input Section */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="lg:col-span-2"
+        >
+          <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm sticky top-24">
+            <h2 className="font-heading text-lg font-bold text-gray-900 mb-4">Tell us about your trip</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-[13px] font-semibold text-gray-700 mb-1.5">
+                  {t("whatLookingFor")}
+                </label>
+                <textarea
+                  value={interests}
+                  onChange={(e) => setInterests(e.target.value)}
+                  placeholder={t("placeholder")}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all bg-gray-50 focus:bg-white"
+                  rows={4}
+                  disabled={loading}
+                />
+              </div>
 
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t("budget")}
-              </label>
-              <input
-                type="number"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                placeholder={t("budgetPlaceholder")}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                disabled={loading}
-              />
+              <div>
+                <label className="block text-[13px] font-semibold text-gray-700 mb-1.5">
+                  {t("budget")}
+                </label>
+                <input
+                  type="number"
+                  value={budget}
+                  onChange={(e) => setBudget(e.target.value)}
+                  placeholder={t("budgetPlaceholder")}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-gray-50 focus:bg-white"
+                  disabled={loading}
+                />
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={loading || !interests.trim()}
+                className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-3 rounded-xl text-[15px] font-bold hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Thinking...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    {t("buildMyPackage")}
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Quick Suggestions */}
+            <div className="mt-5 pt-4 border-t border-gray-200">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">Try these</p>
+              <div className="space-y-2">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setInterests(s.text)}
+                    disabled={loading}
+                    className="w-full text-left text-[13px] px-3 py-2.5 bg-gray-50 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-colors border border-gray-200 hover:border-blue-200 flex items-center gap-2 font-medium"
+                  >
+                    <span>{s.icon}</span>
+                    <span>{s.text}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
+        </motion.div>
 
-          {/* Quick suggestions */}
-          <div>
-            <p className="text-xs text-gray-400 mb-2">Try these:</p>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => setInterests(s)}
-                  disabled={loading}
-                  className="text-xs px-3 py-1.5 bg-gray-50 text-gray-600 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors border border-gray-100 hover:border-blue-200"
+        {/* Results Section */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-3"
+        >
+          {/* AI Response */}
+          {response && (
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-5 text-white shadow-xl mb-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <span className="text-[13px] font-bold text-white">PackagePro AI</span>
+                  <p className="text-[11px] text-gray-400">Powered by Groq LLaMA 3.3 70B</p>
+                </div>
+              </div>
+              <div className="text-[14px] text-gray-200 whitespace-pre-wrap leading-relaxed">
+                {response}
+              </div>
+            </div>
+          )}
+
+          {/* Recommendation Cards */}
+          {showResults && recommendations.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="font-heading text-lg font-bold text-gray-900">
+                {t("recommendedPackages")}
+              </h3>
+              {recommendations.map((rec, idx) => (
+                <motion.button
+                  key={rec.package.package_id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  onClick={() => router.push(`/packages/${rec.package.package_id}`)}
+                  className="w-full text-left bg-white rounded-2xl border border-gray-200 p-4 hover:border-blue-300 hover:shadow-lg transition-all duration-300 group"
                 >
-                  {s}
-                </button>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] font-bold px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md uppercase tracking-wider">
+                          #{idx + 1} Pick
+                        </span>
+                        <span className="text-lg">{themeIcons[rec.package.theme] || "📦"}</span>
+                        <span className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">{rec.package.theme.replace("_", " ")}</span>
+                      </div>
+                      <h4 className="font-heading text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {rec.package.name}
+                      </h4>
+                      <div className="flex items-center gap-3 mt-1 text-[13px] text-gray-500">
+                        <span className="flex items-center gap-1 font-medium">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {rec.package.city_name}
+                        </span>
+                        <span className="flex items-center gap-1 font-medium">
+                          <Clock className="w-3.5 h-3.5" />
+                          {rec.package.duration_days}D/{rec.package.duration_nights}N
+                        </span>
+                        <span className="flex items-center gap-1 font-medium">
+                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                          <span className="capitalize">{rec.package.tier}</span>
+                        </span>
+                      </div>
+                      <p className="text-[12px] text-green-600 mt-2 flex items-center gap-1 font-medium">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {rec.reason}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-heading text-xl font-bold text-gray-900">
+                        {formatPrice(rec.package.base_price, rec.package.currency)}
+                      </p>
+                      <p className="text-[11px] font-medium text-gray-400 mt-0.5 uppercase tracking-wider">per person</p>
+                      <span className="inline-flex items-center gap-1 mt-2 text-[12px] px-4 py-2 bg-blue-600 text-white rounded-xl font-bold group-hover:bg-blue-700 transition-colors">
+                        View & Customize
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </span>
+                    </div>
+                  </div>
+                </motion.button>
               ))}
             </div>
-          </div>
+          )}
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !interests.trim()}
-            className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Thinking...
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {t("buildMyPackage")}
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* AI Response */}
-      {response && (
-        <div className="mt-6 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white shadow-xl animate-fadeIn">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-lg">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
+          {/* Empty State */}
+          {!response && !loading && (
+            <div className="bg-gray-50 rounded-2xl border border-gray-200 p-10 text-center">
+              <div className="text-5xl mb-3">✨</div>
+              <h3 className="font-heading text-lg font-bold text-gray-900 mb-2">Describe your dream trip</h3>
+              <p className="text-[13px] text-gray-500 max-w-sm mx-auto leading-relaxed">
+                Tell us where you want to go, what you want to do, and your budget. Our AI will build the perfect package for you.
+              </p>
             </div>
-            <span className="text-sm font-semibold text-blue-300">{t("packageProAI")}</span>
-          </div>
-          <div className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">
-            {response}
-          </div>
-        </div>
-      )}
-
-      {/* Recommendation Cards */}
-      {showResults && recommendations.length > 0 && (
-        <div className="mt-6 space-y-4 animate-fadeInUp">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {t("recommendedPackages")}
-          </h3>
-          <div className="grid gap-4">
-            {recommendations.map((rec, idx) => (
-              <button
-                key={rec.package.package_id}
-                onClick={() => router.push(`/packages/${rec.package.package_id}`)}
-                className="w-full text-left bg-white rounded-2xl border border-gray-200 p-5 hover:border-blue-300 hover:shadow-lg transition-all duration-300 group"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md">
-                        #{idx + 1} Pick
-                      </span>
-                      <span className="text-xs text-gray-400 capitalize">{rec.package.theme.replace("_", " ")}</span>
-                    </div>
-                    <h4 className="text-lg font-bold text-gray-900 mt-1 group-hover:text-blue-600 transition-colors">
-                      {rec.package.name}
-                    </h4>
-                    <p className="text-sm text-gray-500 mt-0.5">
-                      {rec.package.city_name} · {rec.package.duration_days}D/{rec.package.duration_nights}N · {rec.package.tier}
-                    </p>
-                    <p className="text-xs text-green-600 mt-1.5 flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {rec.reason}
-                    </p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-2xl font-bold text-gray-900">
-                      {formatPrice(rec.package.base_price, rec.package.currency)}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">per person</p>
-                    <span className="inline-block mt-2 text-xs px-3 py-1 bg-blue-600 text-white rounded-lg font-medium group-hover:bg-blue-700 transition-colors">
-                      View & Customize
-                    </span>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+          )}
+        </motion.div>
+      </div>
     </main>
   );
 }
